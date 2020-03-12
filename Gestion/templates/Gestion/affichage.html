@@ -1,0 +1,28 @@
+{% extends 'Gestion/base.html' %}
+
+{% block contenu %}
+<div class="container">
+    <h1>Affichage {% if nom_element %} des {{ nom_element }} {% endif %}</h1>
+    <div class="container">
+        {% for element in informations %}
+        <div class="card" class="row">
+            <table class="table table-striped">
+                <tr>
+                    <th scope="col">#</th>
+                    {% for clef in element.keys%}
+                    <th scope="col"> {{ clef }} </th>
+                    {% endfor %}
+                </tr>
+                <tr>  
+                    <th scope="row"> {{ forloop.counter }} </th> 
+                    {% for valeur in element.values %}
+                        <td>{{ valeur }} </td>
+                    {% endfor %}
+                </tr>
+            </table>
+        </div>
+        <br>
+        {% endfor %}
+    </div>
+</div>
+{% endblock contenu %}

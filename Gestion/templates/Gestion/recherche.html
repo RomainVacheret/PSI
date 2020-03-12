@@ -1,0 +1,50 @@
+{% extends 'Gestion/base.html' %}
+
+{% block contenu %}
+<div class="container">
+    <h1>Recherche {% if nom_element %} des {{ nom_element }} {% endif %}</h1>
+    <form method="POST">
+        {% csrf_token %}
+        {{formulaire.as_p}}
+        <input class="btn btn-success" type="submit" value="Valider">
+    </form>
+</div>
+
+{% if affichage %}
+    <div class="container">
+        <h1>Affichage {% if nom_element %} des {{ nom_element }} {% endif %}</h1>
+        <div class="container">
+            {% for element in informations %}
+            <div class="card" class="row">
+                <table class="table table-striped">
+                    <tr>
+                        <th scope="col">#</th>
+                        {% for clef in element.keys%}
+                        <th scope="col"> {{ clef }} </th>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <th scope="row"> {{ forloop.counter }} </th>
+                        {% for valeur in element.values %}
+                        <td>{{ valeur }} </td>
+                        {% endfor %}
+                    </tr>
+                </table>
+                <!--  -->
+                <form action="{% url url_modification %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="nom" value={{element.Nom}}>
+                    <input type="hidden" name="prenom" value="{{element.Prenom}}">
+                    <input type="hidden" name="telephone" value="{{element.Telephone}}">
+                    <input type="hidden" name="email" value="{{element.Email}}">
+                    <input type="hidden" name="numero" value="{{element.Numero}}">
+                    <button type="submit" class="btn btn-primary" name="modification">Modifier</button>
+                </form>
+                <!--  -->
+            </div>
+            <br>
+            {% endfor %}
+        </div>
+    </div>
+{% endif%}
+{% endblock contenu %}

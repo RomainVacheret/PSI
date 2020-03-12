@@ -1,0 +1,11 @@
+{% extends 'Gestion/base.html' %}
+
+{% block contenu %}
+<div class="container">
+    <form method="POST">
+        {% csrf_token %}
+        {{formulaire.as_p}}
+        <input class="btn btn-success" type="submit" value="Valider">
+    </form>
+</div>
+{% endblock contenu %}

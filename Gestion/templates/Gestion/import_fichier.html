@@ -1,12 +1,13 @@
-{% extends 'Gestion/base.html' %}
+{% extends "Gestion/base.html" %}
+{% load crispy_forms_tags %}
 
 {% block contenu %}
 <div class="container">
     <h1>Import votre liste d'individu</h1>
-    <form method="POST">
+    <form enctype="multipart/form-data" method="POST">
         {% csrf_token %}
-        <input type="file" name="fichier" required>
-        <input type="submit" value="Impoter">
+        {{ formulaire|crispy }}
+        <input class="btn btn-success" type="submit" value="Importer">
     </form>
 </div>
 {% endblock contenu %}

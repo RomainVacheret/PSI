@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from . import utilitaire
 from .models import Individu, Composante, Niveau, Formation, Modalite, Salle, Groupe, Seance, Type_individu
 from .forms import Form_recherche_individu, Form_ajout_individu,  Form_modification_individu, Form_recherche_promotion, Form_ajout_promotion, Form_import_fichier
 
@@ -12,22 +13,23 @@ def accueil(requete):
 def import_fichier(requete):
     contexte = {
         'titre': 'Import fichier',
-        # 'formulaire': Form_import_fichier()
+        'formulaire': Form_import_fichier()
     }
+
     if requete.method == 'POST':
-        # formulaire = Form_import_fichier(requete.POST, requete.FILES)
-        if 1:#formulaire.is_valid():
-            # utiliser les donnees
+        formulaire = Form_import_fichier(requete.POST, requete.FILES)
+        if formulaire.is_valid():
             fichier = requete.FILES['fichier']
             if not fichier.name.endswith('.csv'):
                 messages.warning(requete, 'le fichier n\'est pas un csv !')
-                pass
-            donnees = fichier.read().decore('UTF-8')
-            print(donnees)
-            messages.success(requete, f'Import effectue !')
-            return redirect('accueil_gestion')
+
+            else:
+                donnees = fichier.read().decode('UTF-8')
+                erreurs = utilitaire.traitement_fichier(donnees)
+                messages.success(requete, f'Import effectue ! {erreurs} erreur(s)')
+                return redirect('accueil_gestion')
         else:
-            messages.warning(requete, 'Erreur lors de l\'import !')
+            messages.warning(requete, 'Erreur lors de l\'import !\n')
     
     return render(requete, 'Gestion/import_fichier.html', contexte)
                 

@@ -25,15 +25,21 @@ def import_fichier(requete):
 
             else:
                 donnees = fichier.read().decode('UTF-8')
-                erreurs = utilitaire.traitement_fichier(donnees)
-                messages.success(requete, f'Import effectue ! {erreurs} erreur(s)')
-                return redirect('accueil_gestion')
+                erreurs, total = utilitaire.traitement_fichier(donnees)
+                if total == erreurs:
+                    messages.warning(requete, 'Echec de l\'import !\n')
+
+                else:
+                    messages.success(requete, f'Import effectue ! {erreurs} erreur(s)\n')
+                    return redirect('accueil_gestion')
+                
         else:
             messages.warning(requete, 'Erreur lors de l\'import !\n')
     
     return render(requete, 'Gestion/import_fichier.html', contexte)
                 
-                
+def export_fichier(requete):
+    pass       
 
 
 def affichage_generique(requete, liste_donnees, nom_element):
@@ -89,8 +95,11 @@ def recherche_individu(requete):
                     liste_individus = liste_individus.filter(**{clef:valeur})
            
             liste_individus = [{
-                (clef.capitalize() if clef != 'fid_type' else 'Type'): (valeur if clef != 'fid_type' else Type_individu.objects.get(pk=valeur).libelle) 
+                (clef.capitalize() if clef != 'fid_type' else 'Type'): \
+                    (valeur if clef != 'fid_type' \
+                    else Type_individu.objects.get(pk=valeur).libelle) 
                 for clef, valeur in individu.items()} for individu in liste_individus]
+
             contexte.update({
                 'affichage': True,
                 'informations': liste_individus,
@@ -197,8 +206,9 @@ def recherche_promotion(requete):
                     return Niveau.objects.get(pk=valeur).libelle
 
             liste_promotions = [{
-                (clef.capitalize() if 'fid' not in clef else clef.split('_')[1].capitalize()): (valeur_fonction_classe(clef, valeur)if 'fid' in clef else valeur)
-                for clef, valeur in promotion.items()}for promotion in liste_promotions]
+                (clef.capitalize() if 'fid' not in clef else clef.split('_')[1].capitalize()): \
+                    (valeur_fonction_classe(clef, valeur) if 'fid' in clef else valeur)
+                for clef, valeur in promotion.items()} for promotion in liste_promotions]
                         
             contexte.update({
                 'affichage': True,
@@ -215,14 +225,26 @@ def ajout_promotion(requete):
         'nom_element': 'individus',
     }
 
-    liste_elements = ('annee', 'fid_formation_id', 'fid_modalite_id', 'fid_niveau_id')
+    liste_elements = ('annee', 'fid_niveau_id', 'fid_modalite_id', 'fid_formation_id')
 
     if requete.method == 'POST':
         formulaire = Form_ajout_promotion(requete.POST)
 
         if formulaire.is_valid():
             donnees = formulaire.cleaned_data
-            print(donnees)
+
+            formations = {str(formation.id_formation): formation.libelle for formation in Formation.objects.all()}
+            modalites = {str(modalite.id): modalite.libelle for modalite in Modalite.objects.all()}
+            niveaux = {str(niveau.id): niveau.libelle for niveau in Niveau.objects.all()}
+            
+            libelle = '{} {} {} {}'.format(
+                donnees["annee"],
+                niveaux[donnees["fid_niveau_id"]],
+                modalites[donnees["fid_modalite_id"]],
+                formations[donnees["fid_formation_id"]]
+            )
+
+            donnees['libelle'] = libelle
             promotion = Groupe(**donnees)
 
             verification = Groupe.objects.all()
@@ -236,7 +258,7 @@ def ajout_promotion(requete):
                 contexte.update({'formulaire': Form_ajout_promotion(donnees)})
             else:        
                 promotion.save()
-                messages.success(requete, f'Promotion creee !')
+                messages.success(requete, f'Promotion {donnees["libelle"]} creee !')
                 return redirect('accueil_gestion')
                 
             

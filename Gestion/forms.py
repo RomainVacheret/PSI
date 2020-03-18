@@ -72,3 +72,7 @@ class Form_ajout_promotion(forms.Form):
 
 class Form_import_fichier(forms.Form):
     fichier = forms.FileField()
+
+# class Form_export_fichier(forms.Form):
+#     choix
+#     pass

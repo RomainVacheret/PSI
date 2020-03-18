@@ -5,6 +5,7 @@ from .models import Individu, Type_individu
 
 def traitement_fichier(donnees):
     cpt = 0
+    total = 0
     donnees = io.StringIO(donnees)
     # next(donnees)  # si premiere ligne pour les informations
 
@@ -18,6 +19,11 @@ def traitement_fichier(donnees):
             individu.save()
         except Exception as e :
             cpt += 1
+            total += 1
             print(e)
     
-    return cpt
+    return cpt, total
+
+
+
+# def export_fi

@@ -21,30 +21,18 @@ class Form_ajout_individu(forms.Form):
     fid_type_id = forms.ChoiceField(label='Type', choices=choix_types, required=False)
 
 class Form_modification_individu(forms.Form):
-
-    # def __init__(self, *args, **kwargs):
-    #     super(Form_modification_individu, self).__init__(*args, **kwargs)
-    
     choix_types = [('', 'Choix')] + [(str(type_individu), type_individu.libelle) for type_individu in Type_individu.objects.all()]
 
-    nom = forms.CharField(disabled=True, initial='toto')
-    prenom = forms.CharField(max_length=50, disabled=True)
-    numero = forms.CharField(max_length=8, disabled=True)
-    # nom = prenom = numero = None
+    nom = forms.CharField(max_length=50)
+    prenom = forms.CharField(max_length=50)
+    numero = forms.CharField(max_length=8)
     email = forms.CharField(max_length=50, required=False)
     telephone = forms.CharField(max_length=10, required=False)  
     fid_type_id = forms.ChoiceField(label='Type', choices=choix_types, required=False)
 
-    def champs_lecture_seule(self, nom, prenom, numero):
-        self.nom = forms.CharField(disabled=True, initial=nom)
-        self.prenom = forms.CharField(disabled=True, initial=prenom)
-        self.numero = forms.CharField(disabled=True, initial=numero)
-
-    # class Meta(forms.Form):
-    #     fields = forms.Form.fields + ('nom', 'prenom', 'numero')
-
-    # class NewMeta:
-    #     readonly = ('nom', 'prenom', )
+    class NewMeta:
+        # readonly = ('nom', 'prenom', )
+        readonly = ('numero',)
 
 class Form_recherche_promotion(forms.Form):
     choix_formations = [('', 'Choix')] + [(str(formation.id_formation), formation.libelle) for formation in Formation.objects.all()]

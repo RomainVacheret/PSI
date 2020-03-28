@@ -1,0 +1,29 @@
+{% extends 'Gestion/base.html' %}
+
+{% block contenu %}
+<div class="container">
+    <h1>Affichage {% if nom_element %} des {{ nom_element }} {% endif %}</h1>
+    <div class="container">
+        {% if element%}
+        <div class="card" class="row">
+            <table class="table table-striped">
+                <tr>
+                    <th scope="col">#</th>
+                    {% for clef in element.keys%}
+                    <th scope="col"> {{ clef }} </th>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    {% for valeur in element.values %}
+                    <td>{{ valeur }} </td>
+                    {% endfor %}
+                </tr>
+            </table>
+        </div>
+        {% else %}
+        <p>Pas d'individu avec le numero {{ numero }}</p>
+        {% endif %}
+        <br>
+    </div>
+</div>
+{% endblock contenu %}

@@ -1,0 +1,10 @@
+{% extends 'Gestion/base.html' %}
+
+{% block contenu %}
+<form method="post">
+    {% csrf_token %}
+    <p>Voulez-vous supprimer "{{ object }}"?</p>
+    <input class="btn btn-primary"  type="submit" value="Supprimer">
+</form>
+
+{% endblock contenu %}

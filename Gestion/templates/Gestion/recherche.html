@@ -19,26 +19,22 @@
                 <table class="table table-striped">
                     <tr>
                         <th scope="col">#</th>
-                        {% for clef in element.keys%}
+                        {% for clef in element.instance.keys %}
                         <th scope="col"> {{ clef }} </th>
                         {% endfor %}
                     </tr>
                     <tr>
                         <th scope="row"> {{ forloop.counter }} </th>
-                        {% for valeur in element.values %}
+                        {% for valeur in element.instance.values %}
                         <td>{{ valeur }} </td>
                         {% endfor %}
                     </tr>
                 </table>
+                <!-- {{element.Numero}} -->
                 <!--  -->
-                <form action="{% url url_modification %}" method="post">
+                <form method="get" action="{% url 'affichage_individu_gestion' element.slug %}">
                     {% csrf_token %}
-                    <input type="hidden" name="nom" value={{element.Nom}}>
-                    <input type="hidden" name="prenom" value="{{element.Prenom}}">
-                    <input type="hidden" name="telephone" value="{{element.Telephone}}">
-                    <input type="hidden" name="email" value="{{element.Email}}">
-                    <input type="hidden" name="numero" value="{{element.Numero}}">
-                    <button type="submit" class="btn btn-primary" name="modification">Modifier</button>
+                    <input class="btn btn-primary" type="submit" value="Détails">
                 </form>
                 <!--  -->
             </div>

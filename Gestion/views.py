@@ -1,8 +1,34 @@
 from django.shortcuts import render, redirect
+from django.forms.models import model_to_dict
 from django.contrib import messages
 from . import utilitaire
-from .models import Individu, Composante, Niveau, Formation, Modalite, Salle, Groupe, Seance, Type_individu
-from .forms import Form_recherche_individu, Form_ajout_individu,  Form_modification_individu, Form_recherche_promotion, Form_ajout_promotion, Form_import_fichier
+from .models import (
+    Individu,
+    Composante,
+    Niveau,
+    Formation,
+    Modalite,
+    Salle,
+    Groupe,
+    Seance,
+    Type_individu,
+)
+from .forms import (
+    Form_recherche_individu,
+    Form_ajout_individu,
+    Form_modification_individu,
+    Form_recherche_promotion,
+    Form_ajout_promotion,
+    Form_import_fichier,
+)
+from django.views.generic import (
+    ListView,
+    CreateView,
+    DetailView,
+    UpdateView, 
+    DeleteView,
+)
+
 
 
 clefs_individu = ('nom', 'prenom', 'numero', 'email', 'telephone')
@@ -156,7 +182,7 @@ def modification_individu(requete):
         
         elif 'validation' in requete.POST:
             print('titi')
-            formulaire = Form_ajout_individu(requete.POST)
+            formulaire = Form_modification_individu(requete.POST)
         
             if formulaire.is_valid():
                 donnees = formulaire.cleaned_data
@@ -267,3 +293,89 @@ def ajout_promotion(requete):
 
 def modification_promotion(requete):
     pass
+
+
+class Suppression_individu(DeleteView):
+    model = Individu
+    template_name = 'Gestion/suppression.html'
+    success_url = '/'
+
+
+
+
+def recherche_individu2(requete):
+    contexte = {
+        'titre': 'Recherche individu',
+        'formulaire': Form_recherche_individu(),
+        'nom_element': 'individus',
+        'affichage': False,
+        'url_modification': 'modification_individu_gestion'
+    }
+
+    if requete.method == 'POST':
+        formulaire = Form_recherche_individu(requete.POST)
+        
+        if formulaire.is_valid():
+            donnees = formulaire.cleaned_data
+            liste_elements = ('prenom', 'nom', 'numero', 'fid_type')
+            liste_individus = Individu.objects.values(*liste_elements)
+            liste_attributs = ('fid_type_id', 'numero', 'nom')
+            
+            if donnees['type_individu'] == 'Choix':
+                donnees['type_individu'] = ''
+
+            for clef, valeur in zip(liste_attributs, donnees.values()):
+                if valeur:
+                    liste_individus = liste_individus.filter(**{clef:valeur})
+
+            liste_tmp = []
+            for individu in liste_individus:
+                print(individu.items())
+                liste_tmp.append({
+                    'slug': individu['numero'],
+                    'instance': {(clef.capitalize() if clef != 'fid_type' else 'Type'): \
+                        (valeur if clef != 'fid_type' \
+                        else Type_individu.objects.get(pk=valeur).libelle) 
+                    for clef, valeur in individu.items()}
+                })
+           
+            # liste_individus = [{
+            #         'slug':'individu',
+            #         'instance': {(clef.capitalize() if clef != 'fid_type' else 'Type'): \
+            #             (valeur if clef != 'fid_type' \
+            #             else Type_individu.objects.get(pk=valeur).libelle) 
+            #         for clef, valeur in individu.items()}} for individu in liste_individus]
+
+            # for a in liste
+
+            contexte.update({
+                'affichage': True,
+                'informations': liste_tmp,
+            })
+
+    return render(requete, 'Gestion/recherche.html', contexte)
+
+
+def affichage_individu(requete, numero):
+    try:
+        individu = Individu.objects.filter(numero=numero).values()[0]
+    except:
+        individu = None
+        individu_id = None
+
+    if individu:
+        types_invididus = {type_individu.id: type_individu.libelle for type_individu in Type_individu.objects.all()}
+        # individu = model_to_dict(individu)
+        individu_id = individu.pop('id')
+        print('id------', individu_id)
+        individu['fid_type_id'] = types_invididus[individu['fid_type_id']]
+
+    contexte = {
+        'titre': 'Individu {0}'.format(numero),
+        'nom_element': 'individus',
+        'element': individu,
+        'numero': numero,
+        'element_id': individu_id,
+    }
+
+    return render(requete, 'Gestion/affichage_detail.html', contexte)

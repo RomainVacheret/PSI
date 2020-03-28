@@ -38,13 +38,6 @@ class Form_modification_individu(forms.Form):
     fid_type_id = forms.ChoiceField(label='Type', choices=choix_types, required=True)
 
 
-class Form_modif(forms.ModelForm):
-
-    class Meta:
-        fields = '__all__'
-        model = Individu
-
-
 class Form_recherche_promotion(forms.Form):
     choix_formations = [('', 'Choix')] + [(str(formation.id_formation), formation.libelle) for formation in Formation.objects.all()]
     choix_modalites = [('', 'Choix')] + [(str(modalite.id), modalite.libelle) for modalite in Modalite.objects.all()]
@@ -67,6 +60,17 @@ class Form_ajout_promotion(forms.Form):
     fid_formation_id = forms.ChoiceField(label='Formation', choices=choix_formations)
     fid_modalite_id = forms.ChoiceField(label='Modalite', choices=choix_modalites)
     fid_niveau_id = forms.ChoiceField(label='Niveau', choices=choix_niveaux)
+
+
+# class Form_modification_promotion(forms.Form):
+#     choix_formations = [(str(formation.id_formation), formation.libelle) for formation in Formation.objects.all()]
+#     choix_modalites = [(str(modalite.id), modalite.libelle) for modalite in Modalite.objects.all()]
+#     choix_niveaux = [(str(niveau.id), niveau.libelle) for niveau in Niveau.objects.all()]
+    
+#     annee = forms.CharField(label='Annee', max_length=4)
+#     fid_formation_id = forms.ChoiceField(label='Formation', choices=choix_formations)
+#     fid_modalite_id = forms.ChoiceField(label='Modalite', choices=choix_modalites)
+#     fid_niveau_id = forms.ChoiceField(label='Niveau', choices=choix_niveaux)
 
 
 class Form_import_fichier(forms.Form):

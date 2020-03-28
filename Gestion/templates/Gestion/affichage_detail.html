@@ -23,9 +23,15 @@
         <p>{{ erreur }}</p>
         {% endif %}
         <br>
-        <form method="get" action="{% url nom_url slug %}">
+        {% if slug_modification %}
+            <form method="POST" action="{% url nom_url_modification slug_modification %}">
+                {% csrf_token %}
+                <input class="btn btn-primary" type="submit" value="Modifier">
+            </form>
+        {% endif %}
+        <form method="POST" action="{% url nom_url_suppression slug_suppression %}">
             {% csrf_token %}
-            <input class="btn btn-primary" type="submit" value="Modifier">
+            <input class="btn btn-danger" type="submit" value="Supprimer">
         </form>
     </div>
 </div>

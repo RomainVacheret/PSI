@@ -23,6 +23,10 @@
         <p>{{ erreur }}</p>
         {% endif %}
         <br>
+        <form method="get" action="{% url nom_url slug %}">
+            {% csrf_token %}
+            <input class="btn btn-primary" type="submit" value="Modifier">
+        </form>
     </div>
 </div>
 {% endblock contenu %}

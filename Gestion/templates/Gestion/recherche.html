@@ -31,7 +31,7 @@
                     </tr>
                 </table>
                 <!--  -->
-                <form method="get" action="{% url url_name element.slug %}">
+                <form method="post" action="{% url nom_url element.slug %}">
                     {% csrf_token %}
                     <input class="btn btn-primary" type="submit" value="Détails">
                 </form>

@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.forms.models import model_to_dict
 from django.contrib import messages
 from . import utilitaire
@@ -20,6 +20,7 @@ from .forms import (
     Form_recherche_promotion,
     Form_ajout_promotion,
     Form_import_fichier,
+    Form_modif,
 )
 from django.views.generic import (
     ListView,
@@ -162,35 +163,27 @@ def ajout_individu(requete):
     return render(requete, 'Gestion/ajout.html', contexte)
 
 
-def modification_individu(requete):
+def modification_individu(requete, numero):
     contexte = {
         'titre': 'Modification individu',
         'formulaire':  Form_modification_individu(),
         'nom_element': 'individus'
     }
 
-    liste_elements = ('prenom', 'nom', 'email', 'numero', 'telephone', 'fid_type')
+    liste_elements = ('prenom', 'nom', 'email', 'numero', 'telephone', 'fid_type_id')
 
     if requete.method == 'POST':
-        if 'modification' in requete.POST:
-            print('toto')
-            donnees = {clef: valeur for clef, valeur in requete.POST.dict().items() if clef in liste_elements}
-            formulaire = Form_modification_individu(donnees)
-            formulaire.nom = donnees['nom']
-            formulaire.fid_type_id = ()
-            contexte.update({'formulaire': formulaire})
-        
-        elif 'validation' in requete.POST:
-            print('titi')
-            formulaire = Form_modification_individu(requete.POST)
-        
-            if formulaire.is_valid():
-                donnees = formulaire.cleaned_data
-                Individu.objects.get(numero=donnees['numero']).update(**donnees)
-                messages.success(requete, f'Individu {donnees.get("prenom")} {donnees.get("nom")} modifie !')
-                return redirect('accueil_gestion')
-        else:
-            raise Exception('Erreur -- modification_individu')
+        formulaire = Form_modification_individu(requete.POST)
+
+        if formulaire.is_valid():
+            donnees = formulaire.cleaned_data
+            Individu.objects.filter(numero=donnees['numero']).update(**donnees)
+            messages.success(requete, f'Individu {donnees.get("prenom")} {donnees.get("nom")} mis a jour !')
+            return redirect('/individu/{}'.format(donnees['numero']))
+
+    instance = Individu.objects.filter(numero=numero).values(*liste_elements)[0]
+    formulaire = Form_modification_individu(initial=instance)
+    contexte.update({'formulaire': formulaire})
             
     return render(requete, 'Gestion/ajout.html', contexte)
 
@@ -301,7 +294,7 @@ def recherche_promotion(requete):
             print(liste_promotions)
                         
             contexte.update({
-                'url_name': 'affichage_promotion_gestion',
+                'nom_url': 'affichage_promotion_gestion',
                 'affichage': True,
                 'informations': liste_promotions,
             })
@@ -412,7 +405,7 @@ def recherche_individu(requete):
             contexte.update({
                 'affichage': True,
                 'informations': liste_tmp,
-                'url_name': 'affichage_individu_gestion',
+                'nom_url': 'affichage_individu_gestion',
             })
 
     return render(requete, 'Gestion/recherche.html', contexte)
@@ -437,6 +430,8 @@ def affichage_individu(requete, numero):
         'element': individu,
         'erreur': 'Pas d\'individu avec le numero {}'.format(numero),
         'element_id': individu_id,
+        'nom_url': 'modification_individu_gestion',
+        'slug': numero,
     }
 
     return render(requete, 'Gestion/affichage_detail.html', contexte)

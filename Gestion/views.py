@@ -21,11 +21,7 @@ from .forms import (
     Form_ajout_promotion,
     Form_import_fichier,
 )
-from django.views.generic import DeleteView
 
-
-
-clefs_individu = ('nom', 'prenom', 'numero', 'email', 'telephone')
 
 def accueil(requete):
     return render(requete, 'Gestion/accueil.html')

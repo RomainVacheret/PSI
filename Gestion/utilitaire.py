@@ -23,7 +23,3 @@ def traitement_fichier(donnees):
             print(e)
     
     return cpt, total
-
-
-
-# def export_fi

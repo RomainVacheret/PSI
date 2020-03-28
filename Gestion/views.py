@@ -261,25 +261,31 @@ def recherche_promotion(requete):
             donnees = formulaire.cleaned_data
             liste_elements = ('annee', 'fid_formation_id', 'fid_modalite_id', 'fid_niveau_id', 'libelle')
             liste_promotions = Groupe.objects.values('libelle')
-            
-            for element in liste_elements[1:-1]:
-                if donnees[element] == 'Choix':
-                    donnees[element] = ''
-
-            for clef, valeur in zip(liste_elements, donnees.values()):
+            '''
+            Filtre
+            for clef, valeur in zip(liste_attributs, donnees.values()):
                 if valeur:
-                    liste_promotions = liste_promotions.filter(**{clef:valeur})
+                    liste_individus = liste_individus.filter(**{clef:valeur})
+            '''
             
-            def valeur_fonction_classe(attribut, valeur):
-                assert attribut in (liste_elements[1:])
-                if attribut == 'fid_formation_id':
-                    return Formation.objects.get(pk=valeur).libelle
+            # for element in liste_elements[1:-1]:
+            #     if donnees[element] == 'Choix':
+            #         donnees[element] = ''
 
-                elif attribut == 'fid_modalite_id':
-                    return Modalite.objects.get(pk=valeur).libelle
+            # for clef, valeur in zip(liste_elements, donnees.values()):
+            #     if valeur:
+            #         liste_promotions = liste_promotions.filter(**{clef:valeur})
+            
+            # def valeur_fonction_classe(attribut, valeur):
+            #     assert attribut in (liste_elements[1:])
+            #     if attribut == 'fid_formation_id':
+            #         return Formation.objects.get(pk=valeur).libelle
 
-                else:
-                    return Niveau.objects.get(pk=valeur).libelle
+            #     elif attribut == 'fid_modalite_id':
+            #         return Modalite.objects.get(pk=valeur).libelle
+
+            #     else:
+            #         return Niveau.objects.get(pk=valeur).libelle
 
             # liste_promotions = [{
             #     'slug': promotion['libelle'],
@@ -402,7 +408,6 @@ def recherche_individu(requete):
             #             else Type_individu.objects.get(pk=valeur).libelle) 
             #         for clef, valeur in individu.items()}} for individu in liste_individus]
 
-            # for a in liste
 
             contexte.update({
                 'affichage': True,
@@ -416,22 +421,21 @@ def recherche_individu(requete):
 def affichage_individu(requete, numero):
     try:
         individu = Individu.objects.filter(numero=numero).values()[0]
-    except:
+    except Exception as e :
+        print(e)
         individu = None
         individu_id = None
 
     if individu:
-        types_invididus = {type_individu.id: type_individu.libelle for type_individu in Type_individu.objects.all()}
-        # individu = model_to_dict(individu)
         individu_id = individu.pop('id')
-        print('id------', individu_id)
-        individu['fid_type_id'] = types_invididus[individu['fid_type_id']]
+        individu['type'] = Type_individu.objects.get(pk=individu.pop('fid_type_id')).libelle
+        individu = {clef.capitalize(): valeur for clef, valeur in individu.items()}
 
     contexte = {
         'titre': 'Individu {0}'.format(numero),
         'nom_element': 'individus',
         'element': individu,
-        'numero': numero,
+        'erreur': 'Pas d\'individu avec le numero {}'.format(numero),
         'element_id': individu_id,
     }
 
@@ -439,9 +443,6 @@ def affichage_individu(requete, numero):
 
 
 def affichage_promotion(requete, libelle):
-    print(f'--{libelle}--')
-    for a in Groupe.objects.all():
-        print(a, f'--{a.libelle}--')
     try:
         promotion = Groupe.objects.filter(libelle=libelle).values()[0]
     except Exception as e :
@@ -449,10 +450,8 @@ def affichage_promotion(requete, libelle):
         promotion = None
         promotion_id = None
 
-    print(promotion)
-    liste_fids = ('fid_formation_id', 'fid_modalite_id', 'fid_niveau_id')
     def valeur_fonction_classe(attribut, valeur):
-        assert attribut in liste_fids
+        assert attribut in ('fid_formation_id', 'fid_modalite_id', 'fid_niveau_id')
         if attribut == 'fid_formation_id':
             return Formation.objects.get(pk=valeur).libelle
 
@@ -464,47 +463,17 @@ def affichage_promotion(requete, libelle):
 
     if promotion:
         promotion_id = promotion.pop('id')
-        for clef, valeur in promotion.items():
-            if 'fid' in clef:
-                promotion[clef] = valeur_fonction_classe(clef, valeur)
-
-    print(promotion)
+        promotion = {
+            (clef.capitalize() if 'fid' not in clef else clef.split('_')[1].capitalize()):
+            (valeur if 'fid' not in clef else valeur_fonction_classe(clef, valeur)) 
+            for clef, valeur in promotion.items()}
 
     contexte = {
         'titre': 'Promotion {0}'.format(libelle),
-        'nom_element': 'individus',
+        'nom_element': 'promotions',
         'element': promotion,
-        'numero': libelle,
+        'erreur': 'Pas de promotion avec le libelle : {}'.format(libelle),
         'element_id': promotion_id,
     }
-
-    # if requete.method == 'POST':
-    #     formulaire = Form_recherche_promotion(requete.POST)
-        
-    #     if formulaire.is_valid():
-    #         donnees = formulaire.cleaned_data
-    #         liste_elements = ('annee', 'fid_formation_id', 'fid_modalite_id', 'fid_niveau_id', 'libelle')
-    #         liste_promotions = Groupe.objects.values(*liste_elements)
-            
-    #         for element in liste_elements[1:-1]:
-    #             if donnees[element] == 'Choix':
-    #                 donnees[element] = ''
-
-    #         for clef, valeur in zip(liste_elements, donnees.values()):
-    #             if valeur:
-    #                 liste_promotions = liste_promotions.filter(**{clef:valeur})
-            
-            
-
-    #         liste_promotions = [{
-    #             'slug': promotion['libelle'],
-    #             'instance': {(clef.capitalize() if 'fid' not in clef else clef.split('_')[1].capitalize()): \
-    #                 (valeur_fonction_classe(clef, valeur) if 'fid' in clef else valeur)
-    #             for clef, valeur in promotion.items() if clef != 'libelle'}} for promotion in liste_promotions]
-                        
-    #         contexte.update({
-    #             'affichage': True,
-    #             'informations': liste_promotions,
-    #         })
 
     return render(requete, 'Gestion/affichage_detail.html', contexte)

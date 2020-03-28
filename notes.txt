@@ -16,6 +16,6 @@ recherche
 TODO
     Régler le soucis de modification
     Lien ajout individu dans la nav bar
-    Comment faire des actions sans utiliser de vue
-    URL nav bar pour ajout d'individu
+    Inscrire des etudiants dans une promo
     Intégrer données dans la base à la main
+    Filtrer la recherche des promotions

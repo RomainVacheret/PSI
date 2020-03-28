@@ -9,11 +9,13 @@ urlpatterns = [
     path('composantes', Gestion_views.affichage_composantes, name='affichage_composantes_gestion'),
     path('niveaux', Gestion_views.affichage_niveaux, name='affichage_niveaux_gestion'),
     path('modalites', Gestion_views.affichage_modalites, name='affichage_modalites_gestion'),
+
     path('individu/recherche', Gestion_views.recherche_individu, name='recherche_individu_gestion'),
     path('individu/<numero>', Gestion_views.affichage_individu, name='affichage_individu_gestion'),
     path('individu/ajout', Gestion_views.ajout_individu, name='ajout_individu_gestion'),
     path('individu/modification', Gestion_views.modification_individu, name='modification_individu_gestion'),
     path('individu/<pk>/suppression', Suppression_individu.as_view(), name='suppression_individu_gestion'),
+    
     path('promotion/recherche', Gestion_views.recherche_promotion, name='recherche_promotion_gestion'),
     path('promotion/<libelle>', Gestion_views.affichage_promotion, name='affichage_promotion_gestion'),
     path('promotion/ajout', Gestion_views.ajout_promotion, name='ajout_promotion_gestion'),

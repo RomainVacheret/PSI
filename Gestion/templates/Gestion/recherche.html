@@ -30,9 +30,8 @@
                         {% endfor %}
                     </tr>
                 </table>
-                <!-- {{element.Numero}} -->
                 <!--  -->
-                <form method="get" action="{% url 'affichage_individu_gestion' element.slug %}">
+                <form method="get" action="{% url url_name element.slug %}">
                     {% csrf_token %}
                     <input class="btn btn-primary" type="submit" value="Détails">
                 </form>

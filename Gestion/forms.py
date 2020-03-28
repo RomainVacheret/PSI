@@ -4,7 +4,6 @@ from .models import Type_individu, Niveau, Modalite, Individu, Formation
 class Form_recherche_individu(forms.Form):
     choix_types = [('', 'Choix')] + [(str(type_individu.id), type_individu.libelle) for type_individu in Type_individu.objects.all()]
     
-
     type_individu = forms.ChoiceField(label='Type', choices=choix_types, required=False)
     numero_individu = forms.CharField(label='Numero', max_length=8, required=False)
     nom_individu = forms.CharField(label='Nom', max_length=50, required=False)
@@ -20,31 +19,24 @@ class Form_ajout_individu(forms.Form):
     telephone = forms.CharField(max_length=10, required=False)  
     fid_type_id = forms.ChoiceField(label='Type', choices=choix_types, required=False)
 
+
 class Form_modification_individu(forms.Form):
 
-    # def __init__(self, *args, **kwargs):
-    #     super(Form_modification_individu, self).__init__(*args, **kwargs)
-    
-    choix_types = [('', 'Choix')] + [(str(type_individu), type_individu.libelle) for type_individu in Type_individu.objects.all()]
+    def __init__(self, *args, **kwargs):
+       super().__init__(*args, **kwargs)
+       self.fields['nom'].widget.attrs['readonly'] = True
+       self.fields['numero'].widget.attrs['readonly'] = True
+       self.fields['prenom'].widget.attrs['readonly'] = True
 
-    nom = forms.CharField(disabled=True, initial='toto')
-    prenom = forms.CharField(max_length=50, disabled=True)
-    numero = forms.CharField(max_length=8, disabled=True)
-    # nom = prenom = numero = None
-    email = forms.CharField(max_length=50, required=False)
-    telephone = forms.CharField(max_length=10, required=False)  
-    fid_type_id = forms.ChoiceField(label='Type', choices=choix_types, required=False)
+    choix_types = [(str(type_individu.id), type_individu.libelle) for type_individu in Type_individu.objects.all()]
 
-    def champs_lecture_seule(self, nom, prenom, numero):
-        self.nom = forms.CharField(disabled=True, initial=nom)
-        self.prenom = forms.CharField(disabled=True, initial=prenom)
-        self.numero = forms.CharField(disabled=True, initial=numero)
+    nom = forms.CharField(max_length=50)
+    prenom = forms.CharField(max_length=50)
+    numero = forms.CharField(max_length=8)
+    email = forms.CharField(max_length=50, required=True)
+    telephone = forms.CharField(max_length=10, required=True)  
+    fid_type_id = forms.ChoiceField(label='Type', choices=choix_types, required=True)
 
-    # class Meta(forms.Form):
-    #     fields = forms.Form.fields + ('nom', 'prenom', 'numero')
-
-    # class NewMeta:
-    #     readonly = ('nom', 'prenom', )
 
 class Form_recherche_promotion(forms.Form):
     choix_formations = [('', 'Choix')] + [(str(formation.id_formation), formation.libelle) for formation in Formation.objects.all()]
@@ -70,9 +62,16 @@ class Form_ajout_promotion(forms.Form):
     fid_niveau_id = forms.ChoiceField(label='Niveau', choices=choix_niveaux)
 
 
+# class Form_modification_promotion(forms.Form):
+#     choix_formations = [(str(formation.id_formation), formation.libelle) for formation in Formation.objects.all()]
+#     choix_modalites = [(str(modalite.id), modalite.libelle) for modalite in Modalite.objects.all()]
+#     choix_niveaux = [(str(niveau.id), niveau.libelle) for niveau in Niveau.objects.all()]
+    
+#     annee = forms.CharField(label='Annee', max_length=4)
+#     fid_formation_id = forms.ChoiceField(label='Formation', choices=choix_formations)
+#     fid_modalite_id = forms.ChoiceField(label='Modalite', choices=choix_modalites)
+#     fid_niveau_id = forms.ChoiceField(label='Niveau', choices=choix_niveaux)
+
+
 class Form_import_fichier(forms.Form):
     fichier = forms.FileField()
-
-# class Form_export_fichier(forms.Form):
-#     choix
-#     pass

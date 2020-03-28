@@ -1,0 +1,38 @@
+{% extends 'Gestion/base.html' %}
+
+{% block contenu %}
+<div class="container">
+    <h1>Affichage {% if nom_element %} des {{ nom_element }} {% endif %}</h1>
+    <div class="container">
+        {% if element %}
+        <div class="card" class="row">
+            <table class="table table-striped">
+                <tr>
+                    {% for clef in element.keys%}
+                    <th scope="col"> {{ clef }} </th>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    {% for valeur in element.values %}
+                    <td>{{ valeur }} </td>
+                    {% endfor %}
+                </tr>
+            </table>
+        </div>
+        {% else %}
+        <p>{{ erreur }}</p>
+        {% endif %}
+        <br>
+        {% if slug_modification %}
+            <form method="POST" action="{% url nom_url_modification slug_modification %}">
+                {% csrf_token %}
+                <input class="btn btn-primary" type="submit" value="Modifier">
+            </form>
+        {% endif %}
+        <form method="POST" action="{% url nom_url_suppression slug_suppression %}">
+            {% csrf_token %}
+            <input class="btn btn-danger" type="submit" value="Supprimer">
+        </form>
+    </div>
+</div>
+{% endblock contenu %}

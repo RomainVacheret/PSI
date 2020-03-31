@@ -1,0 +1,9 @@
+body{
+    background-image:url("/static//Gestion/images/nanterre.jpg");
+    background-repeat: no-repeat;
+    alt: initial;
+}
+
+h1{
+    text-align: center;
+}

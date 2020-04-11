@@ -20,6 +20,7 @@ from .forms import (
     Form_recherche_promotion,
     Form_ajout_promotion,
     Form_import_fichier,
+    Form_inscription_etudiants,
 )
 
 
@@ -318,6 +319,7 @@ def affichage_promotion(requete, libelle):
         'element_id': promotion_id,
         'slug_modification': None,
         'slug_suppression': libelle,
+        'slug_inscription': libelle,
         'nom_url_suppression': 'suppression_promotion_gestion',
     }
 
@@ -354,4 +356,46 @@ def suppression_individu(requete, numero):
     messages.warning(requete, 'Erreur lors de la suppression de l\'individu {0} !'.format(numero))
     return redirect('affichage_individu_gestion', numero=numero)
 
+
+def inscription_etudiant(requete, libelle):
+    try:
+        promotion = get_object_or_404(Groupe, libelle=libelle)
+    except Exception as e :
+        print(e)
+        messages.warning(requete, 'Erreur lors de l\'inscription dans la promotion {0} !'.format(libelle))
+        return redirect('accueil_gestion')
+
     
+    liste_etudiants = [etudiant.numero for etudiant in promotion.etudiants.all()]
+
+    print(liste_etudiants)
+    # tous_etudiants = []
+    # etudiants = Individu.objects.filter(fid_type=3)
+    # for etudiant in liste_etudiants:
+    #     etudiant.filter()
+
+
+    contexte = {
+        'titre': 'Inscription etudiants',
+        'formulaire': Form_inscription_etudiants(),
+        'libelle': libelle,
+        'etudiants': liste_etudiants
+    }
+
+    if requete.method == 'POST':
+        formulaire = Form_inscription_etudiants(requete.POST)
+
+        if formulaire.is_valid():
+            # verification_unique = (individu.numero for individu in Individu.objects.all())
+            donnees = formulaire.cleaned_data
+
+            for id_ in donnees['etudiants']:
+                etudiant = Individu.objects.get(id=id_)
+                promotion.etudiants.add(etudiant)
+
+            messages.success(requete, 'Inscriptions faites avec succes !')
+            return redirect('accueil_gestion')
+
+    return render(requete, 'Gestion/inscription.html', contexte)
+
+  

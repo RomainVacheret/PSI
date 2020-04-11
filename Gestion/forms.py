@@ -75,3 +75,12 @@ class Form_ajout_promotion(forms.Form):
 
 class Form_import_fichier(forms.Form):
     fichier = forms.FileField()
+
+
+
+class Form_inscription_etudiants(forms.Form):
+    choix_etudiants = [('', 'Choix')] + [(str(etudiant.id), etudiant.numero) for etudiant in Individu.objects.filter(fid_type=3)]
+
+    etudiants = forms.MultipleChoiceField(label='Etudiants', choices=choix_etudiants)
+
+

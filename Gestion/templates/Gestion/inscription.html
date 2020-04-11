@@ -1,0 +1,32 @@
+{% extends "Gestion/base.html" %}
+{% load crispy_forms_tags %}
+{% block contenu %}
+<div class="form-group">
+
+    <div class="container">
+        {% for numero in etudiants %}
+        <div class="card" class="row">
+            <table class="table table-striped">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col"> Numero </th>
+                </tr>
+                <tr>
+                    <th scope="row"> {{ forloop.counter }} </th>
+                    <td>{{ numero }} </td>
+                </tr>
+            </table>
+        </div>
+        <br>
+        {% endfor %}
+    </div>
+    <div class="custom-control custom-checkbox">
+        <h1>Inscriptions pour la promotion {{ libelle }}</h1>
+        <form method="POST">
+            {% csrf_token %}
+            {{ formulaire|crispy }}
+            <input type="submit" class="btn btn-primary" value="Valider">
+        </form>
+    </div>
+</div>
+{% endblock contenu %}

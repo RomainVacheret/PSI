@@ -280,6 +280,10 @@ def affichage_individu(requete, numero):
         'slug_modification': numero,
         'slug_suppression': numero,
         'nom_url_suppression': 'suppression_individu_gestion',
+        'nom_url_element': 'affichage_promotion_gestion',
+        'slug_affichage': 'numero',
+        'titre_affichage': 'Liste des promotions de l\'etudiant',
+        'liste_affichage': [{'Libelle': promotion.libelle} for promotion in get_object_or_404(Individu, pk=individu_id).groupe_set.all() if individu['Type'] == 'Eleve'],
     }
 
     return render(requete, 'Gestion/affichage_detail.html', contexte)
@@ -321,6 +325,10 @@ def affichage_promotion(requete, libelle):
         'slug_suppression': libelle,
         'slug_inscription': libelle,
         'nom_url_suppression': 'suppression_promotion_gestion',
+        'nom_url_element': 'affichage_promotion_gestion',
+        'slug_affichage': 'libelle',
+        'titre_affichage': 'Liste des etudiants de la promotion',
+        'liste_affichage': [etudiant for etudiant in get_object_or_404(Groupe, pk=promotion_id).etudiants.all().values('numero', 'nom','prenom')],
     }
 
     return render(requete, 'Gestion/affichage_detail.html', contexte)

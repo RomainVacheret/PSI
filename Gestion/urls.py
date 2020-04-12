@@ -21,4 +21,9 @@ urlpatterns = [
     path('promotion/<libelle>/suppression', Gestion_views.suppression_promotion, name='suppression_promotion_gestion'),
     path('promotion/<libelle>/inscription', Gestion_views.inscription_etudiant, name='inscription_gestion'),
     
+    path('seance/recherche', Gestion_views.recherche_seance, name='recherche_seance_gestion'),
+    path('seance/ajout', Gestion_views.ajout_seance, name='ajout_seance_gestion'),
+    path('seance/aa', Gestion_views.accueil, name='affichage_seance_gestion'),
+
+
 ]

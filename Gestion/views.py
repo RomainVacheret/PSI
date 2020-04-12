@@ -12,6 +12,8 @@ from .models import (
     Groupe,
     Seance,
     Type_individu,
+    Type_seance,
+    Salle
 )
 from .forms import (
     Form_recherche_individu,
@@ -21,6 +23,8 @@ from .forms import (
     Form_ajout_promotion,
     Form_import_fichier,
     Form_inscription_etudiants,
+    Form_recherche_seance,
+    Form_ajout_seance,
 )
 
 
@@ -406,4 +410,148 @@ def inscription_etudiant(requete, libelle):
 
     return render(requete, 'Gestion/inscription.html', contexte)
 
-  
+
+def recherche_seance(requete):
+    contexte = {
+        'titre': 'Recherche seance',
+        'formulaire': Form_recherche_seance(),
+        'nom_element': 'seances',
+        'affichage': False,
+        # 'url_modification': 'modification_seance_gestion'
+    }
+
+    if requete.method == 'POST':
+        formulaire = Form_recherche_seance(requete.POST)
+        
+        if formulaire.is_valid():
+            donnees = formulaire.cleaned_data
+            liste_elements = ('date_debut', 'date_fin', 'fid_type_seance', 'fid_salle', 'fid_individu')
+            
+            # liste_attributs = ('fid_type_id', 'numero', 'nom')
+            
+
+            for element in liste_elements[2:]:
+                if donnees[element] == 'Choix':
+                    donnees[element] = ''
+
+            liste_seances = Seance.objects.values(*liste_elements)
+
+            for clef, valeur in zip(liste_elements, donnees.values()):
+                if valeur:
+                    liste_seances = liste_seances.filter(**{clef:valeur})
+                    
+            # liste_seances = [{
+            #         # 'slug': individu['numero'],
+            #         'instance': {clef.capitalize(): valeur
+            #         for clef, valeur in seance.items()}} for seance in liste_seances]
+
+
+            liste_tmp = []
+
+            for seance in liste_seances:
+                instance = {}
+                print(seance.keys())
+                for clef, valeur in seance.items():
+                    print('-', clef, valeur)
+                    if clef in liste_elements[2:]:
+                        # print(clef, instance[clef])
+                        if clef == 'fid_type_seance':
+                            instance['Type'] = Type_seance.objects.get(pk=valeur).libelle
+                        elif clef == 'fid_salle':
+                            instance['Salle'] = Salle.objects.get(pk=valeur).numero
+                        elif clef == 'fid_individu':
+                            instance['Enseignant'] = Individu.objects.get(pk=valeur).numero
+                    else:
+                        instance[clef] = valeur
+                for element in liste_elements[2:]:
+                    seance.pop(element)
+                liste_tmp.append({'instance': instance})
+                
+            
+            print(liste_tmp)
+
+
+            contexte.update({
+                'affichage': True,
+                'informations': liste_tmp,
+                # 'nom_url': None #'affichage_seance_gestion',
+            })
+
+    return render(requete, 'Gestion/recherche.html', contexte)
+
+
+def ajout_seance(requete):
+    contexte = {
+        'titre': 'Ajout seance',
+        'formulaire': Form_ajout_seance(),
+        'nom_element': 'seances',
+    }
+
+    liste_elements = ('date_debut', 'date_fin', 'fid_type_seance', 'fid_salle', 'fid_individu')
+
+    if requete.method == 'POST':
+        formulaire = Form_ajout_seance(requete.POST)
+
+        if formulaire.is_valid():
+            donnees = formulaire.cleaned_data
+
+            
+
+            verification = Seance.objects.all()
+
+            for clef, valeur in zip(liste_elements, donnees.values()):
+                if valeur:
+                    verification = verification.filter(**{clef:valeur})
+
+            if verification.count():
+                messages.warning(requete, 'Cette seance exite deja !')
+                contexte.update({'formulaire': Form_ajout_promotion(donnees)})
+            else:        
+                for element in liste_elements[2:]:
+                    if element == 'fid_type_seance':
+                        donnees[element] = Type_seance.objects.get(pk=donnees[element])
+                    elif element == 'fid_salle':
+                        donnees[element] = Salle.objects.get(pk=donnees[element])
+                    elif element == 'fid_individu':
+                        donnees[element] = Individu.objects.get(pk=donnees[element])
+
+                seance = Seance(**donnees)
+
+                seance.save()
+                messages.success(requete, 'Seance creee !')
+                return render(requete, 'Gestion/accueil.html')
+            
+    return render(requete, 'Gestion/ajout.html', contexte)
+
+
+
+# def affichage_seance(requete, numero):
+#     try:
+#         individu = Individu.objects.filter(numero=numero).values()[0]
+#     except Exception as e :
+#         print(e)
+#         individu = None
+#         individu_id = None
+
+#     if individu:
+#         individu_id = individu.pop('id')
+#         individu['type'] = Type_individu.objects.get(pk=individu.pop('fid_type_id')).libelle
+#         individu = {clef.capitalize(): valeur for clef, valeur in individu.items()}
+
+#     contexte = {
+#         'titre': 'Individu {0}'.format(numero),
+#         'nom_element': 'individus',
+#         'element': individu,
+#         'erreur': 'Pas d\'individu avec le numero {}'.format(numero),
+#         'element_id': individu_id,
+#         'nom_url_modification': 'modification_individu_gestion',
+#         'slug_modification': numero,
+#         'slug_suppression': numero,
+#         'nom_url_suppression': 'suppression_individu_gestion',
+#         'nom_url_element': 'affichage_promotion_gestion',
+#         'slug_affichage': 'numero',
+#         'titre_affichage': 'Liste des promotions de l\'etudiant',
+#         'liste_affichage': [{'Libelle': promotion.libelle} for promotion in get_object_or_404(Individu, pk=individu_id).groupe_set.all() if individu['Type'] == 'Eleve'],
+#     }
+
+#     return render(requete, 'Gestion/affichage_detail.html', contexte)

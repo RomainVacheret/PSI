@@ -125,3 +125,25 @@ class Form_ajout_seance(forms.Form):
     # etudiants = forms.MultipleChoiceField(label='Etudiant', choices=choix_etudiants)
 
 
+
+class Form_modification_seance(forms.Form):
+    def __init__(self, *args, **kwargs):
+       super().__init__(*args, **kwargs)
+       self.fields['id'].widget.attrs['readonly'] = True
+
+    choix_professeurs = [(professeur.id, professeur.numero) for professeur in Individu.objects.filter(fid_type__in=(1, 2))]
+    choix_salles = [(salle.id, salle.numero) for salle in Salle.objects.all()]
+    choix_seance = [(type_.id, type_.libelle) for type_ in Type_seance.objects.all()]
+    # choix_matieres = [(matiere.id, matiere.nom) for matiere in Matiere.objects.all()]
+    # choix_etudiants = [(etudiant.id, etudiant.numero) for etudiant in Etudiant.objects.all()]
+
+    id = forms.IntegerField(label='Numero')
+    date_debut = forms.TimeField(label='Date debut', widget=forms.TimeInput(format='%H:%M'), required=True)
+    date_fin = forms.TimeField(label='Date fin', widget=forms.TimeInput(format='%H:%M'), required=True)
+    fid_individu = forms.ChoiceField(label='Professeur', choices=choix_professeurs, required=True)
+    fid_salle = forms.ChoiceField(label='Salle', choices=choix_salles, required=True)
+    fid_type_seance = forms.ChoiceField(label='Type', choices=choix_seance, required=True)
+    # fid_matiere = forms.ChoiceField(label='Matiere', choices=choix_matieres)
+    # etudiants = forms.MultipleChoiceField(label='Etudiant', choices=choix_etudiants)
+
+

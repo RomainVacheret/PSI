@@ -31,10 +31,12 @@
                     </tr>
                 </table>
                 <!--  -->
-                <form method="post" action="{% url nom_url element.slug %}">
-                    {% csrf_token %}
-                    <input class="btn btn-primary" type="submit" value="Détails">
-                </form>
+                {% if nom_url %}
+                    <form method="post" action="{% url nom_url element.slug %}">
+                        {% csrf_token %}
+                        <input class="btn btn-primary" type="submit" value="Détails">
+                    </form>
+                {% endif %}
                 <!--  -->
             </div>
             <br>

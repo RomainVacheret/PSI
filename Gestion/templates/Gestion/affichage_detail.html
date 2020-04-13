@@ -23,11 +23,49 @@
         <p>{{ erreur }}</p>
         {% endif %}
         <br>
+
+        {% if liste_affichage %}
+        <div class="container">
+            <h1>{{ titre_affichage }}</h1>
+            <table class="table table-striped">
+                <tr>
+                    {% for clef in liste_affichage.0.instance.keys %}
+                    <th scope="col"> {{ clef }} </th>
+                    {% endfor %}
+                    {% if slug_des %}
+                    <th scope="col"> Desinscription</th>
+                    {% endif%}
+                </tr>
+                {% for element in liste_affichage %}
+                    <tr>
+                        {% for valeur in element.instance.values %}
+                        <td>{{ valeur }} </td>
+                        {% endfor %}
+                        {% if slug_des %}
+                        <td>
+                        <form method="POST" action="{% url 'desinscription_gestion' slug_inscription element.id_ %}">
+                            {% csrf_token %}
+                            <input class="btn btn-primary" type="submit" value="Desinscrire">
+                        </form>
+                        </td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+        {% endif%}
+
         {% if slug_modification %}
             <form method="POST" action="{% url nom_url_modification slug_modification %}">
                 {% csrf_token %}
                 <input class="btn btn-primary" type="submit" value="Modifier">
             </form>
+        {% endif %}
+        {% if slug_inscription %}
+        <form method="POST" action="{% url 'inscription_gestion' slug_inscription %}">
+            {% csrf_token %}
+            <input class="btn btn-primary" type="submit" value="Inscrire">
+        </form>
         {% endif %}
         <form method="POST" action="{% url nom_url_suppression slug_suppression %}">
             {% csrf_token %}

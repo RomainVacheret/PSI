@@ -19,5 +19,16 @@ urlpatterns = [
     path('promotion/ajout', Gestion_views.ajout_promotion, name='ajout_promotion_gestion'),
     path('promotion/<libelle>', Gestion_views.affichage_promotion, name='affichage_promotion_gestion'),
     path('promotion/<libelle>/suppression', Gestion_views.suppression_promotion, name='suppression_promotion_gestion'),
+    path('promotion/<libelle>/inscription', Gestion_views.inscription_etudiant, name='inscription_gestion'),
+    path('promotion/<libelle>/desinscription/<numero>', Gestion_views.desinscription_etudiant, name='desinscription_gestion'),
     
+    path('seance/recherche', Gestion_views.recherche_seance, name='recherche_seance_gestion'),
+    path('seance/ajout', Gestion_views.ajout_seance, name='ajout_seance_gestion'),
+    path('seance/<pk>', Gestion_views.affichage_seance, name='affichage_seance_gestion'),
+    path('seance/<pk>/suppression', Gestion_views.suppression_seance, name='suppression_seance_gestion'),
+    path('seance/<pk>/modification', Gestion_views.modification_seance, name='modification_seance_gestion'),
+
+    
+
+
 ]

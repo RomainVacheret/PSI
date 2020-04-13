@@ -12,6 +12,8 @@ from .models import (
     Groupe,
     Seance,
     Type_individu,
+    Type_seance,
+    Salle
 )
 from .forms import (
     Form_recherche_individu,
@@ -20,6 +22,10 @@ from .forms import (
     Form_recherche_promotion,
     Form_ajout_promotion,
     Form_import_fichier,
+    Form_inscription_etudiants,
+    Form_recherche_seance,
+    Form_ajout_seance,
+    Form_modification_seance
 )
 
 
@@ -279,6 +285,11 @@ def affichage_individu(requete, numero):
         'slug_modification': numero,
         'slug_suppression': numero,
         'nom_url_suppression': 'suppression_individu_gestion',
+        'nom_url_element': 'affichage_promotion_gestion',
+        'slug_affichage': 'numero',
+        # 'slug_des': True,
+        'titre_affichage': 'Liste des promotions de l\'etudiant',
+        'liste_affichage': [{'instance': {'Libelle': promotion.libelle}, 'id_': promotion.libelle} for promotion in get_object_or_404(Individu, pk=individu_id).groupe_set.all() if individu['Type'] == 'Eleve'],
     }
 
     return render(requete, 'Gestion/affichage_detail.html', contexte)
@@ -310,6 +321,9 @@ def affichage_promotion(requete, libelle):
             (valeur if 'fid' not in clef else valeur_fonction_classe(clef, valeur)) 
             for clef, valeur in promotion.items()}
 
+    a = [{'instance': etudiant, 'id_': etudiant['numero']} for etudiant in get_object_or_404(Groupe, pk=promotion_id).etudiants.all().values('numero', 'nom','prenom')],
+    print(a)
+
     contexte = {
         'titre': 'Promotion {0}'.format(libelle),
         'nom_element': 'promotions',
@@ -318,7 +332,13 @@ def affichage_promotion(requete, libelle):
         'element_id': promotion_id,
         'slug_modification': None,
         'slug_suppression': libelle,
+        'slug_inscription': libelle,
+        'slug_des': True,
         'nom_url_suppression': 'suppression_promotion_gestion',
+        'nom_url_element': 'affichage_promotion_gestion',
+        'slug_affichage': 'libelle',
+        'titre_affichage': 'Liste des etudiants de la promotion',
+        'liste_affichage': [{'instance': etudiant, 'id_': etudiant['numero']} for etudiant in get_object_or_404(Groupe, pk=promotion_id).etudiants.all().values('numero', 'nom','prenom')],
     }
 
     return render(requete, 'Gestion/affichage_detail.html', contexte)
@@ -354,4 +374,245 @@ def suppression_individu(requete, numero):
     messages.warning(requete, 'Erreur lors de la suppression de l\'individu {0} !'.format(numero))
     return redirect('affichage_individu_gestion', numero=numero)
 
+
+def suppression_seance(requete, pk):
+    try:
+        seance = get_object_or_404(Seance, id=pk)
+    except Exception as e :
+        print(e)
+        seance = None
+
+    if seance:
+        seance.delete()
+        messages.success(requete, 'Seance n°{0} supprimee !'.format(pk))
+        return redirect('recherche_seance_gestion')
     
+    messages.warning(requete, 'Erreur lors de la suppression de la seance n°{0} !'.format(pk))
+    return redirect('affichage_seance_gestion', id=pk)
+
+
+def inscription_etudiant(requete, libelle):
+    try:
+        promotion = get_object_or_404(Groupe, libelle=libelle)
+    except Exception as e :
+        print(e)
+        messages.warning(requete, 'Erreur lors de l\'inscription dans la promotion {0} !'.format(libelle))
+        return redirect('accueil_gestion')
+
+    liste_etudiants = [etudiant.numero for etudiant in promotion.etudiants.all()]
+
+    contexte = {
+        'titre': 'Inscription etudiants',
+        'formulaire': Form_inscription_etudiants(),
+        'libelle': libelle,
+        'etudiants': liste_etudiants
+    }
+
+    if requete.method == 'POST':
+        formulaire = Form_inscription_etudiants(requete.POST)
+
+        if formulaire.is_valid():
+            # verification_unique = (individu.numero for individu in Individu.objects.all())
+            donnees = formulaire.cleaned_data
+
+            for id_ in donnees['etudiants']:
+                etudiant = Individu.objects.get(id=id_)
+                promotion.etudiants.add(etudiant)
+
+            messages.success(requete, 'Inscriptions faites avec succes !')
+            return redirect('accueil_gestion')
+
+    return render(requete, 'Gestion/inscription.html', contexte)
+
+
+def desinscription_etudiant(requete, libelle, numero):
+    try:
+        promotion = get_object_or_404(Groupe, libelle=libelle)
+        etudiant = get_object_or_404(Individu, numero=numero)
+    except Exception as e :
+        print(e)
+        promotion = None
+        etudiant = None
+
+    if promotion and etudiant:
+        promotion.etudiants.remove(etudiant)
+        messages.success(requete, 'Desinscriptions de {} dans {} faites avec succes !'.format(numero, libelle))
+    else:
+        messages.warning(requete, 'Une erreur a eu lieu lors de la desinscriptions ')
+    return redirect('accueil_gestion')
+
+
+def recherche_seance(requete):
+    contexte = {
+        'titre': 'Recherche seance',
+        'formulaire': Form_recherche_seance(),
+        'nom_element': 'seances',
+        'affichage': False,
+        # 'url_modification': 'modification_seance_gestion'
+    }
+
+    if requete.method == 'POST':
+        formulaire = Form_recherche_seance(requete.POST)
+        
+        if formulaire.is_valid():
+            donnees = formulaire.cleaned_data
+            liste_elements = ('id', 'date_debut', 'date_fin', 'fid_type_seance', 'fid_salle', 'fid_individu')
+            
+            # liste_attributs = ('fid_type_id', 'numero', 'nom')
+            
+
+            for element in liste_elements[3:]:
+                if donnees[element] == 'Choix':
+                    donnees[element] = ''
+
+            liste_seances = Seance.objects.values(*liste_elements)
+
+            for clef, valeur in zip(liste_elements, donnees.values()):
+                if valeur:
+                    liste_seances = liste_seances.filter(**{clef:valeur})
+                    
+            # liste_seances = [{
+            #         # 'slug': individu['numero'],
+            #         'instance': {clef.capitalize(): valeur
+            #         for clef, valeur in seance.items()}} for seance in liste_seances]
+
+
+            liste_tmp = []
+
+            for seance in liste_seances:
+                instance = {}
+                print(seance.keys())
+                for clef, valeur in seance.items():
+                    print('-', clef, valeur)
+                    if clef in liste_elements[3:]:
+                        # print(clef, instance[clef])
+                        if clef == 'fid_type_seance':
+                            instance['Type'] = Type_seance.objects.get(pk=valeur).libelle
+                        elif clef == 'fid_salle':
+                            instance['Salle'] = Salle.objects.get(pk=valeur).numero
+                        elif clef == 'fid_individu':
+                            instance['Enseignant'] = Individu.objects.get(pk=valeur).numero
+                    else:
+                        instance[clef] = valeur
+                for element in liste_elements[2:]:
+                    seance.pop(element)
+                liste_tmp.append({'instance': instance, 'slug': instance.pop('id')})
+                
+            
+            print(liste_tmp)
+
+
+            contexte.update({
+                'affichage': True,
+                'informations': liste_tmp,
+                'nom_url': 'affichage_seance_gestion',
+            })
+
+    return render(requete, 'Gestion/recherche.html', contexte)
+
+
+def ajout_seance(requete):
+    contexte = {
+        'titre': 'Ajout seance',
+        'formulaire': Form_ajout_seance(),
+        'nom_element': 'seances',
+    }
+
+    liste_elements = ('date_debut', 'date_fin', 'fid_type_seance', 'fid_salle', 'fid_individu')
+
+    if requete.method == 'POST':
+        formulaire = Form_ajout_seance(requete.POST)
+
+        if formulaire.is_valid():
+            donnees = formulaire.cleaned_data
+
+            
+
+            verification = Seance.objects.all()
+
+            for clef, valeur in zip(liste_elements, donnees.values()):
+                if valeur:
+                    verification = verification.filter(**{clef:valeur})
+
+            if verification.count():
+                messages.warning(requete, 'Cette seance exite deja !')
+                contexte.update({'formulaire': Form_ajout_promotion(donnees)})
+            else:        
+                for element in liste_elements[2:]:
+                    if element == 'fid_type_seance':
+                        donnees[element] = Type_seance.objects.get(pk=donnees[element])
+                    elif element == 'fid_salle':
+                        donnees[element] = Salle.objects.get(pk=donnees[element])
+                    elif element == 'fid_individu':
+                        donnees[element] = Individu.objects.get(pk=donnees[element])
+
+                seance = Seance(**donnees)
+
+                seance.save()
+                messages.success(requete, 'Seance creee !')
+                return render(requete, 'Gestion/accueil.html')
+            
+    return render(requete, 'Gestion/ajout.html', contexte)
+
+
+
+def affichage_seance(requete, pk):
+    try:
+        seance = Seance.objects.filter(pk=pk).values()[0]
+    except Exception as e :
+        print(e)
+        seance = None
+        seance_id = None
+
+
+    print(seance)
+
+    if seance:
+        seance_id = seance.pop('id')
+        seance['type'] = Type_seance.objects.get(pk=seance.pop('fid_type_seance_id')).libelle
+        seance['professeur'] = Individu.objects.get(pk=seance.pop('fid_individu_id')).numero
+        seance['salle'] = Salle.objects.get(pk=seance.pop('fid_salle_id')).numero
+        seance = {clef.capitalize(): valeur for clef, valeur in seance.items()}
+
+    contexte = {
+        'titre': 'Seance {0}'.format(pk),
+        'nom_element': 'seances',
+        'element': seance,
+        'erreur': 'Pas de seance avec l\'id {}'.format(pk),
+        'element_id': pk,
+        'nom_url_modification': 'modification_seance_gestion',
+        'slug_modification': pk,
+        'slug_suppression': pk,
+        'nom_url_suppression': 'suppression_seance_gestion',
+        'nom_url_element': 'affichage_seance_gestion',
+        'slug_affichage': 'numero',
+        # 'titre_affichage': 'Liste des promotions de l\'etudiant',
+        # 'liste_affichage': [{'Libelle': promotion.libelle} for promotion in get_object_or_404(Individu, pk=individu_id).groupe_set.all() if individu['Type'] == 'Eleve'],
+    }
+
+    return render(requete, 'Gestion/affichage_detail.html', contexte)
+
+
+def modification_seance(requete, pk):
+    contexte = {
+        'titre': 'Modification seance',
+        'formulaire':  Form_modification_seance(),
+        'nom_element': 'seances'
+    }
+
+    liste_elements = ('id', 'date_debut', 'date_fin', 'fid_type_seance', 'fid_salle', 'fid_individu')
+
+    if requete.method == 'POST':
+        formulaire = Form_modification_seance(requete.POST)
+
+        if formulaire.is_valid():
+            donnees = formulaire.cleaned_data
+            Seance.objects.filter(pk=donnees['id']).update(**donnees)
+            messages.success(requete, 'Seance n°{} mise a jour !'.format(pk))
+            return redirect('/seance/{}'.format(donnees['id']))
+
+    instance = Seance.objects.filter(pk=pk).values(*liste_elements)[0]
+    formulaire = Form_modification_seance(initial=instance)
+    contexte.update({'formulaire': formulaire})
+            
+    return render(requete, 'Gestion/ajout.html', contexte)

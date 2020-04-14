@@ -17,3 +17,6 @@ Prerequis:
         - Mot de passe : '' (aucun mot de passe)
         - Ajouter des valeurs pour les tables statiques
 
+Notes:
+L'import se fait à partir d'un fichier CSV
+L'export génère un fichier à la racine du projet

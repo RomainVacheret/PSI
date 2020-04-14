@@ -1,6 +1,10 @@
 import io
 import csv
-from .models import Individu, Type_individu
+from .models import (
+    Individu, 
+    Type_individu,
+    Groupe
+)
 
 
 def traitement_fichier(donnees):
@@ -23,3 +27,15 @@ def traitement_fichier(donnees):
         total += 1
     
     return cpt, total
+
+
+def export_donnees():
+    attributs_etudiants = ('nom', 'prenom', 'numero')
+    with open('export.csv', 'w') as fichier:
+        fichier.write(', '.join(('libelle', ) + attributs_etudiants) + '\n')
+        promotions = Groupe.objects.all()
+        for promotion in promotions:
+            instance_promotion = Groupe.objects.get(pk=promotion.id)
+            for etudiant in instance_promotion.etudiants.all():
+                fichier.write('{}, {}\n'.format(promotion.libelle, ', '.join(getattr(etudiant, element) for element in attributs_etudiants)))
+

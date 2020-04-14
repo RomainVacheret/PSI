@@ -32,6 +32,9 @@ from .forms import (
 def accueil(requete):
     return render(requete, 'Gestion/accueil.html')
 
+def export_fichier(requete):
+     return render(requete, 'Gestion/export_fichier.html')
+
 def import_fichier(requete):
     contexte = {
         'titre': 'Import fichier',

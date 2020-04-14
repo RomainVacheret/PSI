@@ -81,7 +81,7 @@ DATABASES = {
         'NAME': 'PSI',
         'HOST': 'localhost',
         'USER': 'root',
-        'PASSWORD': 'assayag2206',
+        'PASSWORD': '',
         'PORT': '3306',
     }
 }

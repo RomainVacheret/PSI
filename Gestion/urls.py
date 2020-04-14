@@ -5,6 +5,7 @@ from . import views as Gestion_views
 urlpatterns = [
     path('', Gestion_views.accueil, name='accueil_gestion'),
     path('import', Gestion_views.import_fichier, name='import_gestion'),
+    path('export', Gestion_views.export_fichier, name='export_gestion'),
     path('composantes', Gestion_views.affichage_composantes, name='affichage_composantes_gestion'),
     path('niveaux', Gestion_views.affichage_niveaux, name='affichage_niveaux_gestion'),
     path('modalites', Gestion_views.affichage_modalites, name='affichage_modalites_gestion'),

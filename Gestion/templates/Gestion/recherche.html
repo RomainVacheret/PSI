@@ -2,7 +2,8 @@
 
 {% block contenu %}
 <div class="container">
-    <h1>Recherche {% if nom_element %} des {{ nom_element }} {% endif %}</h1>
+    <h1 align="center">Recherche {% if nom_element %} des {{ nom_element }} {% endif %}</h1>
+    <hr>
     <form method="POST">
         {% csrf_token %}
         {{formulaire.as_p}}

@@ -1,7 +1,7 @@
 {% extends "Gestion/base.html" %}
 {% block contenu %}
 <hr>
-<h1> Portail de l'Université Paris Nanterre </h1> 
+<h1> Portail de l'Université Paris Nanterre </h1>
 
 <div class="container">
     <div class="row row-cols-1 row-cols-md-2">
@@ -9,7 +9,12 @@
             <div class="card h-100">
                 <img src="/static/Gestion/images/individus.jpg" class="card-img-top" alt="...">
                 <div class="card-body">
-                    <h5 class="card-title"><button type="button" class="btn btn-dark">Gestion</button></h5>
+                    <h5 class="card-title">
+                        <button type="button" class="btn btn-dark"> <a href="{% url 'ajout_individu_gestion' %}">
+                                Ajouter Individu </a> </button>
+                        <button type="button" class="btn btn-dark"> <a href="{% url 'recherche_individu_gestion' %}">
+                                Rechercher Individu </a> </button>
+                    </h5>
                     <p class="card-text">Ajouter ou rechercher un individu (étudiant, professeur, vacataire ...).</p>
                 </div>
             </div>
@@ -18,9 +23,14 @@
             <div class="card h-100">
                 <img src="/static/Gestion/images/promotion.jpg" class="card-img-top" alt="...">
                 <div class="card-body">
-                    <h5 class="card-title"><button type="button" class="btn btn-dark">Gestion Promotion</button></h5>
+                    <h5 class="card-title">
+                        <button type="button" class="btn btn-dark"> <a href="{% url 'ajout_promotion_gestion' %}">
+                                Ajouter Promotion </a> </button>
+                        <button type="button" class="btn btn-dark"> <a href="{% url 'recherche_promotion_gestion' %}">
+                                Rechercher Promotion </a> </button>
+                    </h5>
                     <p class="card-text">Ajouter ou rechercher une promotion en fonction dé l'année, de la filière
-                    et de la voie de formation.</p>
+                        et de la voie de formation.</p>
                 </div>
             </div>
         </div>
@@ -28,17 +38,28 @@
             <div class="card h-100">
                 <img src="/static/Gestion/images/seances.jpg" class="card-img-top" alt="...">
                 <div class="card-body">
-                    <h5 class="card-title"><button type="button" class="btn btn-dark">Gestion Séances</button></h5>
-                    <p class="card-text">Ajouter ou rechercher un créneau horraire soit par une matière ou par un professeur.</p>
+                    <h5 class="card-title">
+                        <button type="button" class="btn btn-dark"> <a href="{% url 'ajout_seance_gestion' %}"> Ajouter
+                                Séances </a> </button>
+                        <button type="button" class="btn btn-dark"> <a href="{% url 'recherche_seance_gestion' %}">
+                                Rechercher Séances </a> </button>
+                    </h5>
+                    <p class="card-text">Ajouter ou rechercher un créneau horraire soit par une salle, un créneau
+                        horraire ou par un professeur.</p>
                 </div>
             </div>
         </div>
         <div class="col mb-4">
             <div class="card h-100">
-                <img src="/static/Gestion/images/export.jpg" height ="356" class="card-img-center" alt="...">
+                <img src="/static/Gestion/images/export.jpg" height="356" class="card-img-center" alt="...">
                 <div class="card-body">
-                    <h5 class="card-title"><button type="button" class="btn btn-dark">Export</button></h5>
-                    <p class="card-text">Exportez les données présentes dans la base actuelle.</p>
+                    <button type="button" class="btn btn-dark"> <a href="{% url 'import_gestion' %}"> Importer Fichier
+                        </a> </button>
+                    <button type="button" class="btn btn-dark"> <a href="{% url 'export_gestion' %}"> Exporter Fichier
+                        </a> </button>
+                    </h5>
+                    <p class="card-text">Exportez les données présentes dans la base actuelle ou alors importez des
+                        données extrieurs pour enrichire la base actuelle.</p>
                 </div>
             </div>
         </div>

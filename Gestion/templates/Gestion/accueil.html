@@ -1,7 +1,7 @@
 {% extends "Gestion/base.html" %}
 {% block contenu %}
 <hr>
-<h1> Portail de l'Université Paris Nanterre </h1>
+<h1> Portail de l'Universite Paris Nanterre </h1>
 
 <div class="container">
     <div class="row row-cols-1 row-cols-md-2">
@@ -15,7 +15,7 @@
                         <button type="button" class="btn btn-dark"> <a href="{% url 'recherche_individu_gestion' %}">
                                 Rechercher Individu </a> </button>
                     </h5>
-                    <p class="card-text">Ajouter ou rechercher un individu (étudiant, professeur, vacataire ...).</p>
+                    <p class="card-text">Ajoutez ou recherchez un individu (etudiant, professeur, vacataire ...).</p>
                 </div>
             </div>
         </div>
@@ -29,8 +29,8 @@
                         <button type="button" class="btn btn-dark"> <a href="{% url 'recherche_promotion_gestion' %}">
                                 Rechercher Promotion </a> </button>
                     </h5>
-                    <p class="card-text">Ajouter ou rechercher une promotion en fonction dé l'année, de la filière
-                        et de la voie de formation.</p>
+                    <p class="card-text">Ajoutez ou recherchez une promotion en fonction de l'annee, de la filiere
+                        et/ou de la voie de formation.</p>
                 </div>
             </div>
         </div>
@@ -40,11 +40,11 @@
                 <div class="card-body">
                     <h5 class="card-title">
                         <button type="button" class="btn btn-dark"> <a href="{% url 'ajout_seance_gestion' %}"> Ajouter
-                                Séances </a> </button>
+                                Seances </a> </button>
                         <button type="button" class="btn btn-dark"> <a href="{% url 'recherche_seance_gestion' %}">
-                                Rechercher Séances </a> </button>
+                                Rechercher Seances </a> </button>
                     </h5>
-                    <p class="card-text">Ajouter ou rechercher un créneau horraire soit par une salle, un créneau
+                    <p class="card-text">Ajoutez ou recherchez un creneau horraire soit par une salle, un créneau
                         horraire ou par un professeur.</p>
                 </div>
             </div>
@@ -58,8 +58,7 @@
                     <button type="button" class="btn btn-dark"> <a href="{% url 'export_gestion' %}"> Exporter Fichier
                         </a> </button>
                     </h5>
-                    <p class="card-text">Exportez les données présentes dans la base actuelle ou alors importez des
-                        données extrieurs pour enrichire la base actuelle.</p>
+                    <p class="card-text">Exportez les etudiants par promotion ou importez de nouveaux etudiants.</p>
                 </div>
             </div>
         </div>

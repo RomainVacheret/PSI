@@ -9,6 +9,7 @@ urlpatterns = [
     path('composantes', Gestion_views.affichage_composantes, name='affichage_composantes_gestion'),
     path('niveaux', Gestion_views.affichage_niveaux, name='affichage_niveaux_gestion'),
     path('modalites', Gestion_views.affichage_modalites, name='affichage_modalites_gestion'),
+    path('salles', Gestion_views.affichage_salles, name='affichage_salles_gestion'),
 
     path('individu/recherche', Gestion_views.recherche_individu, name='recherche_individu_gestion'),
     path('individu/ajout', Gestion_views.ajout_individu, name='ajout_individu_gestion'),

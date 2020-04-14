@@ -32,9 +32,8 @@ class Niveau(models.Model):
 
 class Formation(models.Model):
     id_formation = models.AutoField(primary_key=True)
-    VET = models.IntegerField()  # version de la maquette
+    VET = models.IntegerField()  
     libelle = models.CharField(max_length=50)
-    # fid_composante = models.ForeignKey(Composante, on_delete=models.CASCADE)
     composantes = models.ManyToManyField(Composante)
     date_creation = models.DateTimeField(auto_now_add=True)
     date_MAJ = models.DateTimeField(auto_now=True)
@@ -58,8 +57,8 @@ class Salle(models.Model):
 
 
 class Groupe(models.Model):
-    libelle = models.CharField(max_length=50)  #TODO est-ce necessaire ?
-    annee = models.CharField(max_length=4)  #TODO verifier si le type est pertient
+    libelle = models.CharField(max_length=50)  
+    annee = models.CharField(max_length=4) 
     fid_niveau = models.ForeignKey(Niveau, on_delete=models.CASCADE)
     fid_formation = models.ForeignKey(Formation, on_delete=models.CASCADE)
     fid_modalite = models.ForeignKey(Modalite, on_delete=models.CASCADE)
@@ -78,7 +77,7 @@ class Seance(models.Model):
     date_debut = models.TimeField()
     date_fin = models.TimeField()
     fid_type_seance = models.ForeignKey(Type_seance, on_delete=models.CASCADE)
-    fid_individu = models.ForeignKey(Individu, on_delete=models.CASCADE)  # professeur
+    fid_individu = models.ForeignKey(Individu, on_delete=models.CASCADE)  
     fid_salle = models.ForeignKey(Salle, on_delete=models.CASCADE)
     date_creation = models.DateTimeField(auto_now_add=True)
     date_MAJ = models.DateTimeField(auto_now=True)

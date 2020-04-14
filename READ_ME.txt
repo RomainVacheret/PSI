@@ -15,4 +15,5 @@ Prerequis:
         - Créer une base de données nommée psi
         - Nom utilisateur : 'root'
         - Mot de passe : '' (aucun mot de passe)
+        - Ajouter des valeurs pour les tables statiques
 

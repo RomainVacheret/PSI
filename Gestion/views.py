@@ -97,6 +97,15 @@ def affichage_modalites(requete):
 
     return affichage_generique(requete, liste, 'modalites')
 
+def affichage_salles(requete):
+    liste = [{
+        'salle': salle.numero,
+        'batiment': salle.batiment,
+        'capacite': salle.capacite
+    } for salle in Salle.objects.all()]
+
+    return affichage_generique(requete, liste, 'salles')
+
 
 def ajout_individu(requete):
     contexte = {
@@ -297,7 +306,6 @@ def affichage_individu(requete, numero):
         'nom_url_suppression': 'suppression_individu_gestion',
         'nom_url_element': 'affichage_promotion_gestion',
         'slug_affichage': 'numero',
-        # 'slug_des': True,
         'titre_affichage': 'Liste des promotions de l\'etudiant',
         'liste_affichage': [{'instance': {'Libelle': promotion.libelle}, 'id_': promotion.libelle} for promotion in get_object_or_404(Individu, pk=individu_id).groupe_set.all() if individu['Type'] == 'Eleve'],
     }
@@ -331,8 +339,6 @@ def affichage_promotion(requete, libelle):
             (valeur if 'fid' not in clef else valeur_fonction_classe(clef, valeur)) 
             for clef, valeur in promotion.items()}
 
-    a = [{'instance': etudiant, 'id_': etudiant['numero']} for etudiant in get_object_or_404(Groupe, pk=promotion_id).etudiants.all().values('numero', 'nom','prenom')],
-    print(a)
 
     contexte = {
         'titre': 'Promotion {0}'.format(libelle),
@@ -422,7 +428,6 @@ def inscription_etudiant(requete, libelle):
         formulaire = Form_inscription_etudiants(requete.POST)
 
         if formulaire.is_valid():
-            # verification_unique = (individu.numero for individu in Individu.objects.all())
             donnees = formulaire.cleaned_data
 
             for id_ in donnees['etudiants']:
@@ -458,7 +463,6 @@ def recherche_seance(requete):
         'formulaire': Form_recherche_seance(),
         'nom_element': 'seances',
         'affichage': False,
-        # 'url_modification': 'modification_seance_gestion'
     }
 
     if requete.method == 'POST':
@@ -467,9 +471,7 @@ def recherche_seance(requete):
         if formulaire.is_valid():
             donnees = formulaire.cleaned_data
             liste_elements = ('id', 'date_debut', 'date_fin', 'fid_type_seance', 'fid_salle', 'fid_individu')
-            
-            # liste_attributs = ('fid_type_id', 'numero', 'nom')
-            
+                        
 
             for element in liste_elements[3:]:
                 if donnees[element] == 'Choix':
@@ -481,21 +483,12 @@ def recherche_seance(requete):
                 if valeur:
                     liste_seances = liste_seances.filter(**{clef:valeur})
                     
-            # liste_seances = [{
-            #         # 'slug': individu['numero'],
-            #         'instance': {clef.capitalize(): valeur
-            #         for clef, valeur in seance.items()}} for seance in liste_seances]
-
-
             liste_tmp = []
 
             for seance in liste_seances:
                 instance = {}
-                print(seance.keys())
                 for clef, valeur in seance.items():
-                    print('-', clef, valeur)
                     if clef in liste_elements[3:]:
-                        # print(clef, instance[clef])
                         if clef == 'fid_type_seance':
                             instance['Type'] = Type_seance.objects.get(pk=valeur).libelle
                         elif clef == 'fid_salle':
@@ -508,8 +501,6 @@ def recherche_seance(requete):
                     seance.pop(element)
                 liste_tmp.append({'instance': instance, 'slug': instance.pop('id')})
                 
-            
-            print(liste_tmp)
 
 
             contexte.update({
@@ -575,8 +566,6 @@ def affichage_seance(requete, pk):
         seance_id = None
 
 
-    print(seance)
-
     if seance:
         seance_id = seance.pop('id')
         seance['type'] = Type_seance.objects.get(pk=seance.pop('fid_type_seance_id')).libelle
@@ -599,8 +588,6 @@ def affichage_seance(requete, pk):
         'nom_url_suppression': 'suppression_seance_gestion',
         'nom_url_element': 'affichage_seance_gestion',
         'slug_affichage': 'numero',
-        # 'titre_affichage': 'Liste des promotions de l\'etudiant',
-        # 'liste_affichage': [{'Libelle': promotion.libelle} for promotion in get_object_or_404(Individu, pk=individu_id).groupe_set.all() if individu['Type'] == 'Eleve'],
     }
 
     return render(requete, 'Gestion/affichage_detail.html', contexte)

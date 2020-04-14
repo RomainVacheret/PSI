@@ -27,38 +27,18 @@ from .forms import (
     Form_ajout_seance,
     Form_modification_seance
 )
-import xlsxwriter
 
 
 def accueil(requete):
+    utilitaire.export_donnees()
     return render(requete, 'Gestion/accueil.html')
 
 def export_fichier(requete):
-
-    contexte = {
-        'titre': 'Export fichier',
-        'formulaire': Form_export_fichier()
-    }
-
-    
-    """
-    workbook = xlsxwriter.Workbook('Export.xlsx')
-    worksheet = workbook.add_worksheet()
-    row = 0
-    col = 0
-    # recuperer les donenes a affiché 
-    for nom, prenom, email,numero,telephone,fid_type in (donnees):
-        worksheet.write(row, col,     nom)
-        worksheet.write(row, col + 1, prenom)
-        worksheet.write(row, col + 2, email)
-        worksheet.write(row, col + 3, numero)
-        worksheet.write(row, col + 4, telephone)
-        worksheet.write(row, col + 5, fid_type)
-        row += 1    
-        
-    workbook.close()
-    """
-    return render(requete, 'Gestion/export_fichier.html',contexte)
+    if requete.method == 'POST':
+        utilitaire.export_donnees()
+        messages.success(requete, 'Export effectue ! \n')
+        return render(requete, 'Gestion/accueil.html')
+    return render(requete, 'Gestion/export_fichier.html')
 
 
 
@@ -601,7 +581,10 @@ def affichage_seance(requete, pk):
         seance_id = seance.pop('id')
         seance['type'] = Type_seance.objects.get(pk=seance.pop('fid_type_seance_id')).libelle
         seance['professeur'] = Individu.objects.get(pk=seance.pop('fid_individu_id')).numero
-        seance['salle'] = Salle.objects.get(pk=seance.pop('fid_salle_id')).numero
+        salle = Salle.objects.get(pk=seance.pop('fid_salle_id'))
+        seance['salle'] = salle.numero
+        seance['batiment'] = salle.batiment
+        seance['capacite'] = salle.capacite
         seance = {clef.capitalize(): valeur for clef, valeur in seance.items()}
 
     contexte = {

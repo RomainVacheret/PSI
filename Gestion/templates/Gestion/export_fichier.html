@@ -4,10 +4,10 @@
 {% block contenu %}
 <div class="container">
     <h1>Exportez votre liste d'individu</h1>
-    <form enctype="multipart/form-data" method="POST">
-        {% csrf_token %}
-        {{ formulaire|crispy }}
-        <input class="btn btn-success" type="submit" value="Exportez">
-    </form>
+    <form method="POST">
+            {% csrf_token %}
+            {{ formulaire|crispy }}
+            <input type="submit" class="btn btn-primary" value="Exportez">
+        </form>
 </div>
 {% endblock contenu %}
